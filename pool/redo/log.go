@@ -5,6 +5,9 @@ import (
 	"sync"
 )
 
+// 重做日志的后缀
+const RedoFileShuffle = ".redo"
+
 type WALLogManager struct {
 	bufferSize int                  // BufferPool max size
 	sync       bool                 // if ture sync disk，else tick flush disk

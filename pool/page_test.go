@@ -49,3 +49,12 @@ func TestD(t *testing.T) {
 		fmt.Println(i)
 	}
 }
+
+func TestE(t *testing.T) {
+	var a int = 10
+	func() {
+		fmt.Println(a)
+		a = 20
+	}()
+	fmt.Println(a)
+}
