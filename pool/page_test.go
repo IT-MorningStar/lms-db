@@ -2,6 +2,7 @@ package pool
 
 import (
 	"fmt"
+	"path/filepath"
 	"testing"
 )
 
@@ -51,6 +52,8 @@ func TestD(t *testing.T) {
 }
 
 func TestE(t *testing.T) {
+	fmt.Println(filepath.Join("/123", "a"))
+
 	var a int = 10
 	func() {
 		fmt.Println(a)

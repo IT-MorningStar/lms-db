@@ -5,8 +5,12 @@ import (
 	"errors"
 	"fmt"
 	"hash/crc32"
+	"io/ioutil"
 	"lms-db/constant"
 	"lms-db/engine/storage"
+	"path/filepath"
+	"strconv"
+	"strings"
 	"sync"
 	"time"
 )
@@ -20,6 +24,8 @@ const FileCheckSeconds float64 = 10
 // 日志文件最多多少行
 const FileMaxLineLength int64 = 1024
 
+const MaxFileMerge int64 = 20
+
 const FileShuffle string = ".meta-log"
 
 type MetaManager struct {
@@ -31,15 +37,17 @@ type MetaManager struct {
 	fileSequence int64
 }
 
-func NewMetaManager(filePath string, num int64, fileSequence int64) (*MetaManager, error) {
-	if a, err := storage.NewFileAccess(filePath, 0); err != nil {
+func NewMetaManager(fp string, num int64, fileSequence int64) (*MetaManager, error) {
+	p := filepath.Join(fp, fmt.Sprintf("%d%s", fileSequence, FileShuffle))
+	if a, err := storage.NewFileAccess(p, 0); err != nil {
 		return nil, err
 	} else {
 		return &MetaManager{
-			file:     a,
-			filePath: filePath,
-			num:      num,
-			buffChan: make(chan Meta, 1024),
+			file:         a,
+			filePath:     fp,
+			num:          num,
+			buffChan:     make(chan Meta, 1024),
+			fileSequence: fileSequence,
 		}, nil
 	}
 }
@@ -71,6 +79,7 @@ func (mm *MetaManager) WriteFile(meta Meta) {
 	if float64(mm.num)*SyncFileRate <= float64(len) {
 		mm.WriteSyncFile(meta)
 	} else {
+		mm.num += 1
 		mm.buffChan <- meta
 	}
 }
@@ -99,7 +108,30 @@ func (mm *MetaManager) openNewMetaLogFile(fileName string) {
 
 // todo 需要思考如何加锁
 func (mm *MetaManager) ClearMetaLogFile() {
+	if fs, err := ioutil.ReadDir(filepath.Join(mm.filePath)); err != nil {
+		panic(errors.New(fmt.Sprintf("clear meta log file fail,error: %v", err)))
+	} else {
+		var SecondMax, FirstMax int64
 
+		for _, item := range fs {
+			s := strings.Split(item.Name(), ".")
+			se, suffix := s[0], s[1]
+			if fmt.Sprintf(".%s", suffix) == FileShuffle {
+				if serial, err := strconv.ParseInt(se, 10, 64); err != nil {
+					panic(errors.New(fmt.Sprintf("clear meta log file fail,error: %v", err)))
+				} else {
+					if serial > FirstMax {
+						FirstMax, SecondMax = serial, FirstMax
+					} else {
+						if serial > SecondMax {
+							SecondMax = serial
+						}
+					}
+				}
+			}
+		}
+
+	}
 }
 
 type Meta struct {
