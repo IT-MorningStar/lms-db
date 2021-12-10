@@ -2,7 +2,6 @@ package strategy
 
 import (
 	"container/list"
-	"errors"
 	"sync"
 )
 
@@ -15,8 +14,8 @@ type LruStrategy struct {
 }
 
 type LruStruct struct {
-	key   string
-	value interface{}
+	Key   string
+	Value interface{}
 }
 
 type CallBackFunc func(r LruStruct) bool
@@ -45,21 +44,21 @@ func (ls *LruStrategy) Set(key []byte, value interface{}, h CallBackFunc) {
 	}
 }
 
+// 这里可能死锁
 func (ls *LruStrategy) set(key string, value interface{}, fn CallBackFunc) {
 	ls.mutex.Lock()
 	defer ls.mutex.Unlock()
 	if el, ok := ls.LruMap[key]; ok {
 		ls.LruList.MoveToFront(el)
 	} else {
-		ls.LruList.PushFront(LruStruct{key: key, value: value})
+		ls.LruList.PushFront(LruStruct{Key: key, Value: value})
 		if ls.LruList.Len() > ls.capacity {
 			element := ls.LruList.Back()
 			ele := element.Value.(LruStruct)
-			if fn(ele) {
-				ls.LruList.Remove(element)
-				delete(ls.LruMap, ele.key)
-			} else {
-				panic(errors.New("callback function execute fail"))
+			ls.LruList.Remove(element)
+			delete(ls.LruMap, ele.Key)
+			if fn != nil {
+				fn(ele)
 			}
 		}
 	}

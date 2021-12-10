@@ -8,16 +8,12 @@ import (
 )
 
 type PageManager struct {
-	Pages    map[constant.PageId]*Page
-	Mutex    sync.RWMutex
 	strategy strategy.LruStrategy
 }
 
 // NewPageManager new a  PageManager
 func NewPageManager() *PageManager {
-	return &PageManager{
-		Pages: make(map[constant.PageId]*Page),
-	}
+	return &PageManager{}
 }
 
 // Page 4K ，与操作系统的page cache刚好对应上 Data最大可用字节，4060字节

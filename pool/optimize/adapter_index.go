@@ -2,25 +2,35 @@ package optimize
 
 import (
 	"lms-db/constant"
-	"sync"
+	"lms-db/strategy"
 )
 
 // AdapterManager 自适应hash索引
 type AdapterManager struct {
-	index map[constant.KeyType]*AdapterIndex
+	strategy strategy.LruStrategy
 }
 
 func NewAdapterManager() *AdapterManager {
-	return &AdapterManager{
-		index: make(map[constant.KeyType]*AdapterIndex),
+	return &AdapterManager{}
+}
+
+func (a *AdapterManager) SetIndex(key string, value *AdapterIndex) {
+	a.strategy.Set([]byte(key), value, nil)
+}
+
+func (a *AdapterManager) GetIndex(key string) (*AdapterIndex, bool) {
+
+	if v, ok := a.strategy.Get([]byte(key)); ok {
+		return v.Value.(*AdapterIndex), true
+	} else {
+		return nil, false
 	}
 }
 
 // AdapterIndex 自适应hash索引
 type AdapterIndex struct {
 	Id     constant.PageId // page id
-	Mutex  sync.RWMutex
-	Offset uint16 // []byte Offset
+	Offset uint16          // []byte Offset
 }
 
 // NewAdapterIndex 创建一个自适应hash索引
@@ -32,8 +42,6 @@ func NewAdapterIndex(id constant.PageId, offset uint16) *AdapterIndex {
 }
 
 func (a *AdapterIndex) SetOffset(offset uint16) {
-	a.Mutex.Lock()
-	defer a.Mutex.Unlock()
 	a.Offset = offset
 }
 
