@@ -1,12 +1,5 @@
 package constant
 
-const (
-	_ uint8 = iota
-	StringDataType
-	FloatDataType
-	IntDataType
-)
-
 const LogicLogType = 1
 const (
 	_         uint8 = iota

@@ -55,6 +55,7 @@ func NewMetaManager(fp string, num int64, fileSequence int64) (*MetaManager, err
 func (mm *MetaManager) consumerBuffMsg() {
 	for {
 		select {
+		// todo 没决定好是否用该方式
 		case r := <-mm.buffChan:
 			fmt.Println(r)
 			// 检查文件是否需要创建新的文件
@@ -106,7 +107,7 @@ func (mm *MetaManager) openNewMetaLogFile(fileName string) {
 	}
 }
 
-// todo 需要思考如何加锁
+// todo 合并元数据记录文件
 func (mm *MetaManager) ClearMetaLogFile() {
 	if fs, err := ioutil.ReadDir(filepath.Join(mm.filePath)); err != nil {
 		panic(errors.New(fmt.Sprintf("clear meta log file fail,error: %v", err)))

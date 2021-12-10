@@ -3,12 +3,14 @@ package pool
 import (
 	"encoding/binary"
 	"lms-db/constant"
+	"lms-db/strategy"
 	"sync"
 )
 
 type PageManager struct {
-	Pages map[constant.PageId]*Page
-	Mutex sync.RWMutex
+	Pages    map[constant.PageId]*Page
+	Mutex    sync.RWMutex
+	strategy strategy.LruStrategy
 }
 
 // NewPageManager new a  PageManager
