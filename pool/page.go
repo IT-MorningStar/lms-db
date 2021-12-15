@@ -16,6 +16,14 @@ func NewPageManager() *PageManager {
 	return &PageManager{}
 }
 
+func (pm *PageManager) GetPage(id constant.PageId) (*Page, bool) {
+	if s, ok := pm.strategy.Get(string(id)); ok {
+		return s.Value.(*Page), true
+	} else {
+		return nil, false
+	}
+}
+
 // Page 4K ，与操作系统的page cache刚好对应上 Data最大可用字节，4060字节
 //  lsn  | Crc32 |  Id  | Prev | Next  |  Num ｜ leaf  +  预留   +  idleSpace |  Data ｜
 //  8B   |  4B   |  4B  |  8B  |  8B   |  2B  ｜  1b   +   3b   +   12b      ｜  nB   ｜
@@ -30,7 +38,7 @@ type Page struct {
 	Num    uint16          // current node keys num
 	Leaf   bool            // is leaf node，highest 1 bit
 	Idle   uint16          // high 3 bit reserve ，low 12 bit storage idle space
-	Dirty  bool            // dirty pages
+	Dirty  bool            // dirty pagesManager
 	Data   []byte          // data spaces
 	Mutex  sync.RWMutex
 }
@@ -95,11 +103,10 @@ func (p *Page) ReadKeyByOffset(key string, offset uint16) (result Record) {
 	return
 }
 
-
-
 // Write todo 设置key 到page 中，复杂！复杂！复杂！！！
 func (p *Page) Write(key string, data []byte) (id constant.PageId, off uint16) {
 	p.Mutex.Lock()
 	defer p.Mutex.Unlock()
+
 	return 0, 0
 }

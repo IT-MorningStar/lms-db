@@ -16,3 +16,13 @@ func NewLmsDB(config *config.Config) *LmsDB {
 		bufferPool: pool.NewManagerPool(config),
 	}
 }
+
+// todo
+func (lms *LmsDB) Get(key string) {
+
+}
+
+// todo
+func (Lms *LmsDB) Set(key string, value interface{}) {
+
+}

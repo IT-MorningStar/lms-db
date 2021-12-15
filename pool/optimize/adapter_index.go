@@ -30,21 +30,21 @@ func (a *AdapterManager) GetIndex(key string) (*AdapterIndex, bool) {
 // AdapterIndex 自适应hash索引
 type AdapterIndex struct {
 	Id     constant.PageId // page id
-	Offset uint16          // []byte Offset
+	Offset int16          // []byte Offset
 }
 
 // NewAdapterIndex 创建一个自适应hash索引
-func NewAdapterIndex(id constant.PageId, offset uint16) *AdapterIndex {
+func NewAdapterIndex(id constant.PageId, offset int16) *AdapterIndex {
 	return &AdapterIndex{
 		Id:     id,
 		Offset: offset,
 	}
 }
 
-func (a *AdapterIndex) SetOffset(offset uint16) {
+func (a *AdapterIndex) SetOffset(offset int16) {
 	a.Offset = offset
 }
 
-func (a *AdapterIndex) GetOffset() uint16 {
+func (a *AdapterIndex) GetOffset() int16 {
 	return a.Offset
 }

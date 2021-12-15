@@ -6,7 +6,6 @@ import (
 	"lms-db/strategy"
 	"math"
 	"math/rand"
-	"net/http"
 	_ "net/http/pprof"
 	"path/filepath"
 	"sync"
@@ -258,22 +257,25 @@ func TestCa(t *testing.T) {
 
 func TestTAADSADA(t *testing.T) {
 	ch := make(chan string)
+	fmt.Sprintf("%p", ch)
+	fmt.Println(ch)
+	go func(ch chan string) {
+		fmt.Sprintf("%p", ch)
+		fmt.Println(ch)
+	}(ch)
+
+	time.Sleep(time.Second)
 	//go func() {
-	//	for {
-	//		//ch <- "y"
+	//	if err := http.ListenAndServe("127.0.0.1:9999", nil); err != nil {
+	//		fmt.Println("http server fail")
 	//	}
 	//}()
-	go func() {
-		if err := http.ListenAndServe("127.0.0.1:9999", nil); err != nil {
-			fmt.Println("http server fail")
-		}
-	}()
-	//tk := time.Tick(time.Millisecond)
-	for {
-		select {
-		case <-ch:
-		case <-time.Tick(time.Hour):
-		}
-	}
+	////tk := time.Tick(time.Millisecond)
+	//for {
+	//	select {
+	//	case <-ch:
+	//	case <-time.Tick(time.Hour):
+	//	}
+	//}
 
 }
