@@ -95,6 +95,8 @@ func (p *Page) ReadKeyByOffset(key string, offset uint16) (result Record) {
 	return
 }
 
+
+
 // Write todo 设置key 到page 中，复杂！复杂！复杂！！！
 func (p *Page) Write(key string, data []byte) (id constant.PageId, off uint16) {
 	p.Mutex.Lock()

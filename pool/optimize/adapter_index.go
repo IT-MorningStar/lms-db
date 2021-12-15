@@ -15,12 +15,12 @@ func NewAdapterManager() *AdapterManager {
 }
 
 func (a *AdapterManager) SetIndex(key string, value *AdapterIndex) {
-	a.strategy.Set([]byte(key), value, nil)
+	a.strategy.Set(key, value, nil)
 }
 
 func (a *AdapterManager) GetIndex(key string) (*AdapterIndex, bool) {
 
-	if v, ok := a.strategy.Get([]byte(key)); ok {
+	if v, ok := a.strategy.Get(key); ok {
 		return v.Value.(*AdapterIndex), true
 	} else {
 		return nil, false

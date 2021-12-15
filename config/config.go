@@ -25,16 +25,17 @@ type (
 		MetaLogFileMaxLine int `yaml:"MetaLogFileMaxLine"` // meta log max line count,create new file exceeded
 	}
 
-	BufferPool struct {
-		FlushDiskSecond int  `yaml:"FlushDiskSecond"` // how many seconds to flush 1
-		Sync            bool `yaml:"Sync"`            // sync file true
+	RedoLog struct {
+		FlushDiskSecond    int   `yaml:"FlushDiskSecond"`    // how many seconds to flush 1
+		Sync               bool  `yaml:"Sync"`               // sync file true
+		RedoLogFileMaxSize int64 `yaml:"RedoLogFileMaxSize"` //
 	}
 )
 
 type Config struct {
 	store       *Store
 	performance *Optimize
-	bufferPool  *BufferPool
+	redoLog     *RedoLog
 	pageParams  *PageParams
 	mutex       sync.RWMutex
 }
@@ -47,9 +48,10 @@ func NewConfig() *Config {
 			LogSpace:  "/Users/lichangxiao/dinfull/Project/Golang/lms-db/LMS-DB/log",
 		},
 		performance: &Optimize{AdapterIndexNum: 200},
-		bufferPool: &BufferPool{
-			FlushDiskSecond: 1,
-			Sync:            true,
+		redoLog: &RedoLog{
+			FlushDiskSecond:    1,
+			Sync:               true,
+			RedoLogFileMaxSize: 2 * 1024 * 1024,
 		},
 		pageParams: &PageParams{
 			PageSize:          4 * 1024,
@@ -75,10 +77,10 @@ func (c *Config) GetPerformanceConfig() *Optimize {
 	return c.performance
 }
 
-func (c *Config) GetBufferPoolConfig() *BufferPool {
+func (c *Config) GetRedoLogConfig() *RedoLog {
 	c.mutex.RLock()
 	defer c.mutex.RUnlock()
-	return c.bufferPool
+	return c.redoLog
 }
 
 func (c *Config) GetPageParams() *PageParams {

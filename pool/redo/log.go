@@ -1,15 +1,17 @@
 package redo
 
 import (
+	"lms-db/config"
 	"lms-db/engine/storage"
+	"path/filepath"
 	"sync"
 )
 
 // 重做日志的后缀
-const RedoFileShuffle = ".redo"
+const RedoFileName = "lms-db.redo"
 
 type WALLogManager struct {
-	bufferSize int                  // BufferPool max size
+	bufferSize int                  // RedoLog max size
 	sync       bool                 // if ture sync disk，else tick flush disk
 	flushSec   int                  // how many seconds to  flush second
 	bufferPool chan WALLogStructure // buffer pool
@@ -26,8 +28,20 @@ type WALLogStructure interface {
 	Decode([]byte) (err error)
 }
 
+func NewLogManager(config *config.Config) *WALLogManager {
+	return newLogManager(
+		1024,
+		config.GetRedoLogConfig().Sync,
+		config.GetRedoLogConfig().FlushDiskSecond,
+		filepath.Join(config.GetStoreConfig().LogSpace, RedoFileName),
+		0,
+		0,
+		config.GetRedoLogConfig().RedoLogFileMaxSize,
+	)
+}
+
 // NewLogManager creates a new WALLogManager
-func NewLogManager(bs int, sync bool, flushSec int, logPath string, start, end, maxSize int64) *WALLogManager {
+func newLogManager(bs int, sync bool, flushSec int, logPath string, start, end, maxSize int64) *WALLogManager {
 	if lf, err := storage.NewFileAccess(logPath, 0); err == nil {
 		lm := &WALLogManager{
 			bufferSize: bs,

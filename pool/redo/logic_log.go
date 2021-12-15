@@ -4,7 +4,7 @@ import "encoding/binary"
 
 var _ WALLogStructure = (*LogicLogStructure)(nil)
 
-// 逻辑日志为了主从同步使用
+// todo 逻辑日志为了主从同步使用 暂时未启动。
 type LogicLogStructure struct {
 	LogType uint8  // buffer pool log type
 	KLength uint8  // key length
