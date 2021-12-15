@@ -12,3 +12,7 @@
    - sync page 数据异步、同步刷盘
    - check point机制
    - meta data 
+   
+ 读流程
+ ![Image text](https://raw.githubusercontent.com/IT-MorningStar/lms-db/master/img/lms-db-read.png)
+
